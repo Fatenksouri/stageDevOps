@@ -1,0 +1,9 @@
+.git
+logs
+*.logs*.tmp
+.env
+venv
+env
+Dockerfile.*
+README.md
+node_modules
