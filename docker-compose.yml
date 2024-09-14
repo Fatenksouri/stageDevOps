@@ -1,12 +1,24 @@
 version: '3'
 services:
   db:
-    image: postgres:13
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    image: mysql:5.7
+    restart: always
     environment:
-      POSTGRES_DB: stage_esprit
-      POSTGRES_USER: root
-      POSTGRES_HOST_AUTH_METHOD: trust
+      MYSQL_DATABASE: stage_esprit
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ''
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - "3306:3306"
+    volumes:
+      db_data:/var/lib/mysql
+    network_mode: host
   web:
-    image: 
+    image: fatenk/stagedevops-back
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    network_mode: host
+volumes:
+  db_data:
