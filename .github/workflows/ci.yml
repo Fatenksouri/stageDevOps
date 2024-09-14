@@ -1,0 +1,56 @@
+name: Stage DevOps Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Set Up Python Environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Create and Activate Virtual Environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+      - name: Install Dependencies
+        run: |
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install djangorestframework-simplejwt
+      - name: Static Code Analysis
+        run: |
+          source venv/bin/activate
+          pip install flake8
+          python -c "import sys; sys.setrecursionlimit(1500)"
+          flake8 . --exclude=venv,sympy --statistics --count --max-line-length=127 --exit-zero --verbose
+      - name: Run Tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          source venv/bin/activate
+          python manage.py test
+      - name: Test Coverage
+        run: |
+          source venv/bin/activate
+          pip install coverage
+          coverage run --source='.' manage.py test
+          coverage report
+          coverage html
+      - name: Docker Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }
+      - name: Build docker image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/stagedevops-back .
+      - name: Push docker image
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/stagedevops-back
