@@ -56,4 +56,4 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/stagedevops-back
       - name: Run Docker Compose
         run: |
-          docker-compose up -d
+          docker compose up -d
