@@ -116,7 +116,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'stage_esprit',
         'USER': 'root',
-        'HOST': 'localhost',
+        'HOST': os.environ.get('DATABASE_HOST','localhost'),
         'PORT': '3306',
     }
 }
